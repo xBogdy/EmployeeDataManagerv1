@@ -6,13 +6,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.io.*;
 
 public class EmployeeDataManager {
     static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("d-MMM-yyyy");
     static List<Employee> employees = new ArrayList<Employee>();
     static int x = 1;
     private static boolean exit = false;
-
+    public static String filename;
     public static void addEmployees() {
         Scanner scanner = new Scanner(System.in);
         for (int i = 0; i < x; i++, x++) {
@@ -152,7 +153,7 @@ public class EmployeeDataManager {
         --x;
     }
 
-    public static void runMenu() throws ParseException {
+    public static void runMenu() throws ParseException, IOException {
         while (!exit) {
             printHeader();
             int choice = getMenuChoice();
@@ -164,11 +165,14 @@ public class EmployeeDataManager {
         System.out.println("+-----------------------------------+");
         System.out.println("|        Choose what to do          |");
         System.out.println("|        1.Add Employee             |");
-        System.out.println("|        2.Display Employee         |");
-        System.out.println("|        3.Manage Employee          |");
-        System.out.println("|        4.Search Employee          |");
-        System.out.println("|        5.Delete Employee          |");
-        System.out.println("|        6.Exit                     |");
+        //:TODO fa ca optiunile csv sa aiba un menu separat si mai adauga optiuni
+        System.out.println("|        2.Read from Csv             |");
+        System.out.println("|        3.Write to Csv             |");
+        System.out.println("|        4.Display Employee         |");
+        System.out.println("|        5.Manage Employee          |");
+        System.out.println("|        6.Search Employee          |");
+        System.out.println("|        7.Delete Employee          |");
+        System.out.println("|        8.Exit                     |");
         System.out.println("+-----------------------------------+");
     }
 
@@ -192,36 +196,75 @@ public class EmployeeDataManager {
             } catch (NumberFormatException ex) {
                 System.out.println("Invalid selection. Numbers only.");
             }
-            if (choice < 0 || choice > 6) {
+            if (choice < 0 || choice > 8) {
                 System.out.println("Choice outside of range. Please chose again.");
             }
-        } while (choice < 0 || choice > 6);
+        } while (choice < 0 || choice > 8);
         return choice;
     }
 
-    private static void performAction(int choice) throws ParseException {
+    private static void performAction(int choice) throws ParseException, IOException {
         switch (choice) {
             case 1:
                 EmployeeDataManager.addEmployees();
                 break;
             case 2:
-                EmployeeDataManager.displayEmployee();
+                EmployeeDataManager.writeCvs();
                 break;
             case 3:
-                EmployeeDataManager.manageEmployee();
+                EmployeeDataManager.readCvs();
                 break;
             case 4:
-                EmployeeDataManager.searchEmployee();
+                EmployeeDataManager.displayEmployee();
                 break;
             case 5:
+                EmployeeDataManager.manageEmployee();
+                break;
+            case 6:
+                EmployeeDataManager.searchEmployee();
+                break;
+            case 7:
                 EmployeeDataManager.deleteEmployee();
                 break;
             default:
                 System.out.println("Unknown error");
-            case 6:
+            case 8:
                 exit = true;
         }
     }
 
+    private static void writeCvs() throws IOException {
+        String username = System.getProperty("user.name");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter filename without extention");
+        filename = scanner.nextLine();
+        FileWriter writer = new FileWriter("C:\\Users\\"+username+"\\Desktop\\"+filename+".csv", true);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+
+            for (int i = 0; i < employees.size(); i++) {
+            String name;
+            String surname;
+            LocalDate birthdate;
+            name = employees.get(i).getName();
+            surname = employees.get(i).getSurname();
+            birthdate = employees.get(i).getBirthdate();
+            bufferedWriter.write("\n"+name+','+surname+','+birthdate);
+        }
+        bufferedWriter.flush();
+        bufferedWriter.close();
+
+        writer.close();
+        System.out.println("Done, file was created. path:  "+"C:\\Users\\"+username+"\\Desktop\\"+filename+".csv");
+    }
+    private static void readCvs() throws IOException {
+        File fileToRead = new File("C:\\Users\\mrnic\\Desktop\\"+filename+".csv");
+        FileReader fileReader = new FileReader(fileToRead);
+        BufferedReader reader = new BufferedReader(fileReader);
+
+        String line;
+        while((line = reader.readLine())!= null){
+            System.out.println(line);
+        }
+    }
 
 }
