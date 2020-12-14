@@ -233,7 +233,6 @@ public class EmployeeDataManager {
         }
     }
 
-    private static void writeCvs() throws IOException {
         String username = System.getProperty("user.name");
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter filename without extention");
@@ -265,6 +264,42 @@ public class EmployeeDataManager {
         while((line = reader.readLine())!= null){
             System.out.println(line);
         }
+
+
+    private static void exit(){
+    System.exit(0);
+    System.out.println("Program finished successfully");
+    
+    Employee[] emp = {new Employee("Peter", "Smith"), new Employee("Jake", "Dean")};
+
+        try {
+            FileOutputStream out = new FileOutputStream("C:\\Users\\'+username+'\\Desktop\\example.dat");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
+            for(Employee e: employees){
+                objectOutputStream.writeObject(e);
+            }
+            objectOutputStream.flush();
+
+
+            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("C:\\Users\\'+username+'\\Desktop\\example.dat"));
+            while(true){
+                try{
+                    Object o = objectInputStream.readObject();
+                    if(o == null){
+                        break;
+                    }
+                    System.out.println("" + (Employee) o);
+                } catch (Exception ex) {
+                    System.out.println("EOF rezolvat");
+                    break;
+                }
+
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+}
     }
 
 }
